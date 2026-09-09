@@ -23,6 +23,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/apache/iceberg-go"
 	"github.com/apache/iceberg-go/internal"
 	iceio "github.com/apache/iceberg-go/io"
 	"github.com/stretchr/testify/mock"
@@ -113,6 +114,22 @@ func (t *ViewTestSuite) TestCreateViewJoinsTrailingSlashMetadataLocation() {
 	metadataFile, err := fs.Open(metadataLocation)
 	t.Require().NoError(err)
 	t.Require().NoError(metadataFile.Close())
+}
+
+func TestCreateViewRejectsNilSchema(t *testing.T) {
+	createdView, err := CreateView(
+		t.Context(),
+		"test-catalog",
+		[]string{"ns", "test_view"},
+		nil,
+		"select 1",
+		[]string{"ns"},
+		"mem://view-create-location/test-view-nil-schema/",
+		nil,
+	)
+	require.Error(t, err)
+	require.ErrorIs(t, err, iceberg.ErrInvalidArgument)
+	require.Nil(t, createdView)
 }
 
 func (t *ViewTestSuite) TestLocation() {

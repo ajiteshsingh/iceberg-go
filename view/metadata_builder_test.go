@@ -164,6 +164,45 @@ func TestNewVersion_RepresentationValidation(t *testing.T) {
 	}
 }
 
+func TestSetCurrentVersion_NilInputs(t *testing.T) {
+	_, err := newTestBuilder().
+		SetLoc("location").
+		SetCurrentVersion(nil, newTestSchema(0)).
+		Build()
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, ErrInvalidViewMetadata)
+	assert.ErrorContains(t, err, "version is required")
+
+	_, err = newTestBuilder().
+		SetLoc("location").
+		SetCurrentVersion(newTestVersion(1, 0), nil).
+		Build()
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, ErrInvalidViewMetadata)
+	assert.ErrorContains(t, err, "schema is required")
+}
+
+func TestAddVersion_NilVersion(t *testing.T) {
+	_, err := newTestBuilder().
+		SetLoc("location").
+		AddSchema(newTestSchema(0)).
+		AddVersion(nil).
+		Build()
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, ErrInvalidViewMetadata)
+	assert.ErrorContains(t, err, "version is required")
+}
+
+func TestAddSchema_NilSchema(t *testing.T) {
+	_, err := newTestBuilder().
+		SetLoc("location").
+		AddSchema(nil).
+		Build()
+	assert.Error(t, err)
+	assert.ErrorIs(t, err, ErrInvalidViewMetadata)
+	assert.ErrorContains(t, err, "schema is required")
+}
+
 func TestAddVersion_InvalidRepresentation_Validation(t *testing.T) {
 	invalidVersion := &Version{
 		VersionID: 1,

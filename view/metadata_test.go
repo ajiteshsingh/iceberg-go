@@ -90,6 +90,21 @@ func TestNewMetadata(t *testing.T) {
 	assert.Equal(t, []VersionLogEntry{{TimestampMS: 1000, VersionID: 1}}, md.VersionLog())
 }
 
+func TestNewMetadataRejectsNilInputs(t *testing.T) {
+	schema := newTestSchema(0)
+	version := newTestVersion(1, 0)
+
+	md, err := NewMetadata(nil, schema, "location", nil)
+	require.Error(t, err)
+	require.ErrorIs(t, err, ErrInvalidViewMetadata)
+	require.Nil(t, md)
+
+	md, err = NewMetadata(version, nil, "location", nil)
+	require.Error(t, err)
+	require.ErrorIs(t, err, ErrInvalidViewMetadata)
+	require.Nil(t, md)
+}
+
 func TestNewMetadataRejectInvalidFormatVersion(t *testing.T) {
 	tests := []struct {
 		name      string

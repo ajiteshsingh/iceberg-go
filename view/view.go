@@ -144,6 +144,10 @@ func createView(
 	ioProps iceberg.Properties,
 	metadataProps iceberg.Properties,
 ) (*View, error) {
+	if schema == nil {
+		return nil, fmt.Errorf("%w: schema cannot be nil", iceberg.ErrInvalidArgument)
+	}
+
 	versionId := int64(1)
 
 	builder, err := NewMetadataBuilder()

@@ -116,6 +116,18 @@ func (b *MetadataBuilder) SetCurrentVersion(version *Version, schema *iceberg.Sc
 		return b
 	}
 
+	if version == nil {
+		b.err = fmt.Errorf("%w: version is required", ErrInvalidViewMetadata)
+
+		return b
+	}
+
+	if schema == nil {
+		b.err = fmt.Errorf("%w: schema is required", ErrInvalidViewMetadata)
+
+		return b
+	}
+
 	newSchemaID, err := b.addSchema(schema)
 	if b.setErr(err) {
 		return b
@@ -145,6 +157,10 @@ func (b *MetadataBuilder) AddVersion(newVersion *Version) *MetadataBuilder {
 }
 
 func (b *MetadataBuilder) addVersion(newVersion *Version) (int64, error) {
+	if newVersion == nil {
+		return 0, fmt.Errorf("%w: version is required", ErrInvalidViewMetadata)
+	}
+
 	newVersionID := b.reuseOrCreateNewVersionID(newVersion)
 	version := newVersion.Clone()
 	if newVersionID != version.VersionID {
@@ -221,6 +237,10 @@ func (b *MetadataBuilder) AddSchema(schema *iceberg.Schema) *MetadataBuilder {
 }
 
 func (b *MetadataBuilder) addSchema(schema *iceberg.Schema) (int, error) {
+	if schema == nil {
+		return 0, fmt.Errorf("%w: schema is required", ErrInvalidViewMetadata)
+	}
+
 	newSchemaID := b.reuseOrCreateNewSchemaID(schema)
 
 	if _, ok := b.schemasById[newSchemaID]; ok {

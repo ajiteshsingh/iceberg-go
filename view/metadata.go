@@ -658,6 +658,14 @@ func NewMetadata(version *Version, sc *iceberg.Schema, location string, props ic
 
 // NewMetadataWithUUID is like NewMetadata, but allows the caller to specify the UUID of the view rather than creating a new one.
 func NewMetadataWithUUID(version *Version, sc *iceberg.Schema, location string, props iceberg.Properties, viewUUID uuid.UUID) (Metadata, error) {
+	if version == nil {
+		return nil, fmt.Errorf("%w: version is required", ErrInvalidViewMetadata)
+	}
+
+	if sc == nil {
+		return nil, fmt.Errorf("%w: schema is required", ErrInvalidViewMetadata)
+	}
+
 	// Don't call AssignFreshSchemaIDs here as it reassigns field IDs which breaks RCK tests.
 	// The MetadataBuilder.SetCurrentVersion method will handle schema ID normalization.
 
